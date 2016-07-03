@@ -31,12 +31,15 @@ let config = {
 let s3ImageMiddleware = require('s3-image-middleware')(imageConfig);
 
 router.post('/image', s3ImageMiddleware, function(req, res, next) {
-	console.log(req.images);
-	// [
-	// 	{ size: 'original', value: '... image url ...' },
-	// 	{ size: 'medium', value: '... image url ...' }
-	// ]
-	res.json(req.images);
+	console.log(req.s3Image);
+	// {
+	// 	filename: 'profile.jpg',
+	// 	images: [
+	// 		{ size: 'original', value: '... image url ...' },
+	// 		{ size: 'medium', value: '... image url ...' }
+	// 	]
+	// }
+	res.json(req.s3Image);
 });
 ```
 

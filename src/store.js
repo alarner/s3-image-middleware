@@ -49,7 +49,10 @@ module.exports = function(req, config, busboy, gm, s3) {
 				if(err) {
 					return reject(err);
 				}
-				resolve(results);
+				resolve({
+					filename,
+					images: results
+				});
 			});
 		});
 

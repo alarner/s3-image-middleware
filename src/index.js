@@ -44,7 +44,7 @@ module.exports = function(config) {
 
 		store(req, config, busboy, gm, s3)
 		.then(results => {
-			req.images = results;
+			req.s3Image = results;
 			next();
 		})
 		.catch(err => {
