@@ -1,6 +1,6 @@
 {
   "name": "s3-image-middleware",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Express middleware to resize images and upload them to s3",
   "main": "src/index.js",
   "scripts": {
