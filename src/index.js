@@ -48,11 +48,9 @@ module.exports = function(config) {
 		let promise = null;
 
 		if(req[config.url.type] && req[config.url.type][config.url.key]) {
-			console.log('from-url');
 			promise = fromUrl(req, config, gm, s3);
 		}
 		else {
-			console.log('from-upload');
 			let busboy = new Busboy({ headers: req.headers });
 			promise = fromUpload(req, config, busboy, gm, s3);
 		}
@@ -62,7 +60,6 @@ module.exports = function(config) {
 			next();
 		})
 		.catch(err => {
-			console.log('caught error');
 			if(!(err instanceof Howhap)) {
 				err = new Howhap(config.errors.UNKNOWN, { message: err.toString() });
 			}
