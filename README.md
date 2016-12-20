@@ -2,7 +2,7 @@
 
 Express middleware to designed to make streaming image uploads to s3 easy. This module has the following functionality:
 
-1. Streaming files uploads to s3.
+1. Streaming file uploads or remote file urls to s3.
 1. Resize images on the fly, storing multiple images sizes at once.
 1. Customize JSON error messages.
 
@@ -22,6 +22,10 @@ let config = {
 			queueSize: 1
 		}
 	},
+	url: {
+		key: 'picture',
+		type: 'body'
+	},
 	sizes: [
 		{ name: 'original', width: null, height: null },
 		{ name: 'medium', width: 1020, height: 760 }
@@ -31,15 +35,15 @@ let config = {
 let s3ImageMiddleware = require('s3-image-middleware')(imageConfig);
 
 router.post('/image', s3ImageMiddleware, function(req, res, next) {
-	console.log(req.s3Image);
+	console.log(req.s3Images);
 	// {
 	// 	filename: 'profile.jpg',
-	// 	images: [
-	// 		{ size: 'original', value: '... image url ...' },
-	// 		{ size: 'medium', value: '... image url ...' }
-	// 	]
+	// 	sizes: {
+	// 		original: { width: null, height: null, location: '... image url ...' },
+	// 		medium: { width: 1020, height: 760, location: '... image url ...' },
+	// 	}
 	// }
-	res.json(req.s3Image);
+	res.json(req.s3Images);
 });
 ```
 
@@ -144,6 +148,24 @@ Specifies what the chunk size (also referred to as the part size) should be for 
 > default: 10485760
 
 Specifies the number of s3 tasks that should run concurrently.
+
+### url
+
+#### url.key
+
+> type: string
+
+> default: url
+
+Specifies the key where a url in the request can be found. The middleware will download the file from this url (if provided) and upload it to s3.
+
+#### url.type
+
+> type: string
+
+> default: body
+
+Specifies the request property where the url key can be found. Possible values are body, query and params.
 
 ### sizes
 

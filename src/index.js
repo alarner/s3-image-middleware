@@ -2,7 +2,8 @@ let gm = require('gm');
 let AWSS3 = require('aws-sdk').S3;
 let Busboy = require('busboy');
 let merge = require('lodash.merge');
-let store = require('./store');
+let fromUpload = require('./from-upload');
+let fromUrl = require('./from-url');
 let Howhap = require('howhap');
 
 module.exports = function(config) {
@@ -34,20 +35,34 @@ module.exports = function(config) {
 				queueSize: 1
 			}
 		},
+		url: {
+			key: 'url',
+			type: 'body'
+		},
 		sizes: []
 	}, config);
 
 	return function(req, res, next) {
-		let busboy = new Busboy({ headers: req.headers });
 		let { accessKeyId, secretAccessKey } = config.s3;
 		let s3 = new AWSS3({ accessKeyId, secretAccessKey });
+		let promise = null;
 
-		store(req, config, busboy, gm, s3)
-		.then(results => {
-			req.s3Image = results;
+		if(req[config.url.type] && req[config.url.type][config.url.key]) {
+			console.log('from-url');
+			promise = fromUrl(req, config, gm, s3);
+		}
+		else {
+			console.log('from-upload');
+			let busboy = new Busboy({ headers: req.headers });
+			promise = fromUpload(req, config, busboy, gm, s3);
+		}
+
+		promise.then(results => {
+			req.s3Images = results;
 			next();
 		})
 		.catch(err => {
+			console.log('caught error');
 			if(!(err instanceof Howhap)) {
 				err = new Howhap(config.errors.UNKNOWN, { message: err.toString() });
 			}
